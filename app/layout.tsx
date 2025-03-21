@@ -18,6 +18,9 @@ const quicksand = Quicksand({
 export const metadata: Metadata = {
   title: 'Hackathon.dev - The World\'s Largest Hackathon',
   description: 'Join the world\'s largest hackathon with 100K builders, 24 hours, and $1M+ in prizes.',
+  icons: {
+    icon: '/favicon.jpeg',
+  },
 };
 
 export default function RootLayout({
