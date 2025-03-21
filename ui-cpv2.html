@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon.dev - The World's Largest Hackathon</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --primary-purple: #90d6fc;
+            --dark-bg: #0a0a1f;
+            --text-light: #f0f8ff;
+            --text-gray: #b0bec5;
+            --neon-green: #39ff14;
+            --neon-pink: #ff69b4;
+        }
+
+        body {
+            margin: 0;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+            font-family: 'Source Code Pro', monospace;
+            line-height: 1.6;
+        }
+
+        .section {
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .nav-link {
+            padding: 0.75rem 1.25rem;
+            color: var(--text-light);
+            transition: color 0.2s;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        nav .container>div>button {
+            background-color: var(--primary-purple);
+            color: var(--text-light);
+            padding: 0.8rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        nav .container>div>button:hover {
+            background-color: var(--neon-green);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            padding-top: 100px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            color: var(--text-light);
+            margin-bottom: 0.75rem;
+            text-shadow: 0 0 15px rgba(var(--primary-blue-rgb), 0.6);
+        }
+
+        .hero-subtitle {
+            font-size: 2.75rem;
+            line-height: 1.2;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 1.25rem;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .hero-text {
+            font-size: 1.6rem;
+            line-height: 1.85rem;
+            color: var(--text-gray);
+            margin-bottom: 2.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 5.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 3.2rem;
+            }
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 2.5rem;
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+        }
+
+        .progress-container {
+            position: relative;
+            width: 300px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+
+        .progress-bar {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--neon-green));
+            border-radius: 12px;
+            transition: width 0.6s ease-out;
+        }
+
+        .progress-spark {
+            position: absolute;
+            width: 3px;
+            height: 12px;
+            background: var(--neon-green);
+            border-radius: 3px;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 0 8px var(--neon-green);
+        }
+
+        .register-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2.5rem;
+        }
+
+        .register-container>button {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            padding: 1rem 2.5rem;
+            border-radius: 0.75rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+            letter-spacing: 0.06em;
+        }
+
+        .register-container>button:hover {
+            background-color: var(--neon-green);
+        }
+
+
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            margin: 0;
+            width: fit-content;
+            background-color: rgba(17, 24, 39, 0.5);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(var(--primary-blue-rgb), 0.15);
+        }
+
+        .timer-segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 0.75rem;
+            padding: 0.5rem 0.6rem;
+            border-radius: 0.75rem;
+            background-color: rgba(125, 211, 252, 0.15);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(125, 211, 252, 0.1);
+        }
+
+        .time-unit {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--neon-green);
+            text-shadow: 0 0 12px rgba(var(--neon-green-rgb), 0.8);
+            letter-spacing: -0.06em;
+            min-width: 3ch;
+            text-align: center;
+        }
+
+        .unit-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            margin-top: 0.35rem;
+            letter-spacing: 0.04em;
+        }
+
+        @media (max-width: 768px) {
+            .timer-container {
+                padding: 0.75rem;
+            }
+
+            .timer-segment {
+                margin: 0 0.5rem;
+                padding: 0.3rem;
+            }
+
+            .time-unit {
+                font-size: 2.4rem;
+            }
+
+            .unit-label {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .timer-container {
+                padding: 0.5rem;
+            }
+
+            .timer-segment {
+                margin: 0 0.35rem;
+                padding: 0.2rem;
+            }
+
+            .time-unit {
+                font-size: 2rem;
+            }
+
+            .unit-label {
+                font-size: 0.65rem;
+            }
+        }
+
+        .lightning {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg,
+                    var(--primary-blue) 0%,
+                    var(--primary-purple) 50%,
+                    var(--neon-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            display: inline-block;
+            position: relative;
+            text-shadow: none;
+        }
+
+        .gradient-text::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: -1;
+            background: linear-gradient(135deg,
+                    var(--primary-blue) 0%,
+                    var(--primary-purple) 50%,
+                    var(--neon-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: blur(8px);
+            opacity: 0.7;
+        }
+
+        /* Sponsor Section */
+        .sponsor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3.5rem;
+        }
+
+        .sponsor-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .sponsor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center,
+                    rgba(var(--primary-blue-rgb), 0.08),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sponsor-card:hover {
+            transform: translateY(-8px);
+            box-shadow:
+                0 20px 25px -5px rgba(0, 0, 0, 0.2),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                0 0 0 1px rgba(var(--primary-purple-rgb), 0.2);
+            border-color: rgba(var(--primary-purple-rgb), 0.2);
+        }
+
+        .sponsor-card:hover::before {
+            opacity: 1;
+        }
+
+        .sponsor-card h3 {
+            color: var(--text-light);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sponsor-card p {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            line-height: 1.5;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            margin-top: 1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+
+        /* Judge Section - Futuristic Holographic Projections */
+        #judges.section {
+            padding-top: 100px;
+            padding-bottom: 120px;
+        }
+
+        .judge-carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(163, 126, 255, 0.1);
+            border: 2px solid rgba(163, 126, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(163, 126, 255, 0.2);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+
+        .carousel-arrow::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-top: 3px solid rgba(255, 255, 255, 0.8);
+            border-right: 3px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .carousel-arrow:hover::before {
+            border-color: var(--neon-green);
+        }
+
+        .carousel-arrow.prev {
+            left: 20px;
+        }
+
+        .carousel-arrow.next {
+            right: 20px;
+        }
+
+        .carousel-arrow.prev::before {
+            transform: rotate(-135deg);
+            margin-left: 5px;
+        }
+
+        .carousel-arrow.next::before {
+            transform: rotate(45deg);
+            margin-right: 5px;
+        }
+
+        .judge-carousel {
+            position: relative;
+            display: flex;
+            gap: 2rem;
+            padding: 4rem 2rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            perspective: 1000px;
+            perspective-origin: center;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
+        }
+
+        .judge-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .judge-carousel::before,
+        .judge-carousel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .judge-carousel::before {
+            left: 0;
+            background: linear-gradient(to right, rgba(10, 10, 31, 1), transparent);
+        }
+
+        .judge-carousel::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(10, 10, 31, 1), transparent);
+        }
+
+        .judge-card {
+            flex: 0 0 calc(50% - 2rem);
+            min-width: 400px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            scroll-snap-align: center;
+            transform: perspective(1000px) rotateY(-15deg) translateZ(0);
+            transform-origin: center center;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(163, 126, 255, 0.1);
+            box-shadow:
+                0 8px 16px rgba(0, 0, 0, 0.15),
+                0 0 20px rgba(163, 126, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .judge-card:active {
+            cursor: grabbing;
+        }
+
+        .judge-card:hover {
+            transform: perspective(1000px) rotateY(0deg) translateZ(50px) scale(1.05);
+            border-color: var(--neon-green);
+            box-shadow:
+                0 18px 36px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(57, 255, 20, 0.4);
+            z-index: 1;
+        }
+
+        .judge-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent 0%,
+                    rgba(163, 126, 255, 0.1) 50%,
+                    transparent 100%);
+            transform: rotate(45deg);
+            animation: holographic-sweep 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes holographic-sweep {
+            0% {
+                transform: rotate(45deg) translateY(-100%);
+            }
+
+            100% {
+                transform: rotate(45deg) translateY(100%);
+            }
+        }
+
+        .judge-video {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+            opacity: 0.98;
+            filter:
+                contrast(1.1) hue-rotate(0deg);
+            transition: all 0.4s ease;
+            clip-path: polygon(5% 0%, 95% 0%,
+                    100% 5%, 100% 95%,
+                    95% 100%, 5% 100%,
+                    0% 95%, 0% 5%);
+        }
+
+        .judge-card:hover .judge-video {
+            filter:
+                contrast(1.2) hue-rotate(15deg);
+            clip-path: polygon(3% 0%, 97% 0%,
+                    100% 3%, 100% 97%,
+                    97% 100%, 3% 100%,
+                    0% 97%, 0% 3%);
+        }
+
+        .judge-card h3 {
+            color: var(--neon-green);
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-shadow:
+                0 0 6px rgba(57, 255, 20, 0.7),
+                0 0 12px rgba(57, 255, 20, 0.3);
+            transform: translateZ(20px);
+        }
+
+        .judge-card p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.4;
+            letter-spacing: 0.03em;
+            transform: translateZ(10px);
+        }
+
+        /* Enhanced Glitch Effect */
+        @keyframes glitch-anim {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.98;
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+
+            5%,
+            25%,
+            45%,
+            65%,
+            85% {
+                transform: translate(1px, -0.5px) scale(1.005) rotateY(-1deg);
+                opacity: 0.95;
+                clip-path: polygon(0 1%, 100% 0%, 100% 99%, 0 100%);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translate(-0.5px, 0.5px) scale(0.995) rotateY(1deg);
+                opacity: 0.96;
+                clip-path: polygon(0 0%, 100% 1%, 100% 100%, 0 99%);
+            }
+        }
+
+        .judge-card .judge-video {
+            animation: glitch-anim 5s steps(10, end) infinite alternate;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .judge-card {
+                flex: 0 0 calc(70% - 2rem);
+                min-width: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .judge-card {
+                flex: 0 0 calc(85% - 1.5rem);
+                min-width: 300px;
+                padding: 1.75rem;
+                transform: perspective(1000px) rotateY(-10deg) translateZ(0);
+            }
+
+            .judge-video {
+                margin-bottom: 1rem;
+            }
+
+            .judge-card h3 {
+                font-size: 1.4rem;
+            }
+
+            .judge-card p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .judge-carousel {
+                padding: 3rem 1rem;
+            }
+
+            .judge-card {
+                flex: 0 0 calc(95% - 1rem);
+                min-width: 250px;
+                padding: 1.5rem;
+                transform: perspective(1000px) rotateY(-5deg) translateZ(0);
+            }
+        }
+
+        /* Add smooth scrolling behavior to the carousel */
+        .judge-carousel {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+        }
+
+        .judge-carousel::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari, Opera */
+        }
+
+        /* Navigation dots for the carousel */
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(163, 126, 255, 0.3);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot:hover {
+            background: rgba(57, 255, 20, 0.3);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .carousel-dot.active {
+            background: var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        /* Overview Section */
+        #overview.section {
+            background-color: var(--gray-900);
+        }
+
+        #overview .container>div>div.bg-white {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        #overview .container>div>div.bg-white::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center,
+                    rgba(var(--primary-blue-rgb), 0.08),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #overview .container>div>div.bg-white:hover {
+            transform: translateY(-8px);
+            box-shadow:
+                0 20px 25px -5px rgba(0, 0, 0, 0.2),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                0 0 0 1px rgba(var(--primary-purple-rgb), 0.2);
+            border-color: rgba(var(--primary-purple-rgb), 0.2);
+        }
+
+        #overview .container>div>div.bg-white:hover::before {
+            opacity: 1;
+        }
+
+        #overview .container>div>div.bg-white h3.section-title {
+            color: var(--neon-green);
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-shadow:
+                0 0 6px rgba(57, 255, 20, 0.7),
+                0 0 12px rgba(57, 255, 20, 0.3);
+            transform: translateZ(20px);
+            transition: color 0.3s ease;
+        }
+
+        #overview .container>div>div.bg-white:hover h3.section-title {
+            animation: none; /* Remove the previous hover animation */
+        }
+
+        #overview .container>div>div.bg-white p.text-4xl {
+            color: var(--neon-pink);
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        #overview .container>div>div.bg-white:hover p.text-4xl {
+            animation: none; /* Remove the previous hover animation */
+        }
+
+        #overview .container>div>div:first-child h3.section-title {
+            color: var(--primary-purple);
+            text-shadow: 0 0 6px rgba(var(--primary-purple-rgb), 0.5);
+        }
+
+        #overview .container>div>div:first-child:hover h3.section-title {
+            animation: none; /* Remove the previous hover animation */
+        }
+
+        @keyframes text-scramble {
+            0%, 100% {
+                opacity: 1;
+                transform: translateZ(20px);
+                filter: none;
+            }
+            25% {
+                opacity: 0.8;
+                transform: translateZ(20px) skewX(2deg);
+                filter: blur(0.5px);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translateZ(20px) skewX(-2deg);
+                filter: blur(0.8px);
+            }
+            75% {
+                opacity: 0.8;
+                transform: translateZ(20px) skewX(1deg);
+                filter: blur(0.5px);
+            }
+        }
+
+        /* Add glitch spans for scramble effect */
+        .scramble-on-hover {
+            position: relative;
+            display: inline-block;
+        }
+
+        .scramble-on-hover::before,
+        .scramble-on-hover::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .scramble-on-hover::before {
+            animation: glitch-1 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .scramble-on-hover::after {
+            animation: glitch-2 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        @keyframes glitch-2 {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(2px, -2px);
+            }
+            40% {
+                transform: translate(2px, 2px);
+            }
+            60% {
+                transform: translate(-2px, -2px);
+            }
+            80% {
+                transform: translate(-2px, 2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        #overview .container>div>div.bg-white p.text-gray-600 {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.4;
+            letter-spacing: 0.03em;
+            transform: translateZ(10px);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            margin-top: 1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        #overview .container>div>div:first-child .space-y-4 div.flex span.text-blue-600 {
+            color: var(--neon-green);
+            font-size: 1.2rem;
+        }
+
+        #overview .container>div>div:first-child .space-y-4 div.flex span+span {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+
+        /* Schedule Section */
+        #schedule.section {
+            background-color: var(--gray-800);
+        }
+
+        #schedule .container>div.max-w-3xl>div.space-y-8>div.bg-white {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #schedule .container>div.max-w-3xl>div.space-y-8>div.bg-white h3.section-title {
+            color: var(--primary-blue);
+            text-shadow: 0 0 4px rgba(var(--primary-blue-rgb), 0.3);
+            margin-bottom: 1rem;
+        }
+
+        #schedule .container>div.max-w-3xl>div.space-y-8>div.bg-white p.text-gray-600 {
+            color: var(--gray-700);
+            font-size: 1.05rem;
+        }
+
+
+        /* Challenges Section */
+        #challenges.section {
+            background-color: var(--gray-900);
+        }
+
+        #challenges .container>div.grid>div.bg-white {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #challenges .container>div.grid>div.bg-white:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        #challenges .container>div.grid>div.bg-white h3.section-title {
+            color: var(--primary-purple);
+            text-shadow: 0 0 5px rgba(var(--primary-purple-rgb), 0.4);
+            margin-bottom: 1.2rem;
+        }
+
+        #challenges .container>div.grid>div.bg-white p.text-gray-600 {
+            color: var(--gray-700);
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+
+        /* Prizes Section */
+        #prizes.section {
+            background-color: var(--gray-800);
+        }
+
+        #prizes .container>div.grid>div.bg-white {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #prizes .container>div.grid>div.bg-white:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        #prizes .container>div.grid>div.bg-white::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center,
+                    rgba(var(--primary-blue-rgb), 0.08),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #prizes .container>div.grid>div.bg-white:hover::before {
+            opacity: 1;
+        }
+
+        #prizes .container>div.grid>div.bg-white h3.section-title {
+            color: var(--neon-green);
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-shadow:
+                0 0 6px rgba(57, 255, 20, 0.7),
+                0 0 12px rgba(57, 255, 20, 0.3);
+            transform: translateZ(20px);
+            position: relative;
+        }
+
+        #prizes .container>div.grid>div.bg-white p.text-3xl {
+            color: var(--neon-pink);
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 
+                0 0 7px var(--neon-pink),
+                0 0 10px var(--neon-pink),
+                0 0 21px var(--neon-pink);
+            position: relative;
+        }
+
+        #prizes .container>div.grid>div.bg-white p.text-gray-600 {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            line-height: 1.4;
+            letter-spacing: 0.03em;
+            transform: translateZ(10px);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            margin-top: 1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+
+        /* Sponsors Section */
+        #sponsors.section {
+            background-color: var(--gray-900);
+        }
+
+        #sponsors .container>div.grid-cols-4>div.bg-white {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #sponsors .container>div.grid-cols-4>div.bg-white:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        #sponsors .container>div.grid-cols-4>div.bg-white::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center,
+                    rgba(var(--primary-blue-rgb), 0.08),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #sponsors .container>div.grid-cols-4>div.bg-white:hover::before {
+            opacity: 1;
+        }
+
+        #sponsors .container>div.grid-cols-4>div.bg-white span.text-xl {
+            color: var(--gray-800);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+
+        /* Contestants Section */
+        #contestants.section {
+            background-color: var(--gray-900);
+            text-align: center;
+        }
+
+        #contestants .container>div.max-w-3xl>p.text-xl {
+            color: var(--text-gray);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        #contestants .container>div.max-w-3xl>button {
+            background-color: var(--neon-green);
+            color: var(--gray-900);
+            padding: 1.1rem 3rem;
+            border-radius: 0.8rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            letter-spacing: 0.06em;
+            box-shadow: 0 0 10px rgba(var(--neon-green-rgb), 0.5);
+        }
+
+        #contestants .container>div.max-w-3xl>button:hover {
+            background-color: var(--neon-green);
+            color: var(--gray-900);
+            box-shadow: 0 0 15px rgba(var(--neon-green-rgb), 0.6);
+        }
+
+
+        /* Docs & Support Section */
+        #docs.section {
+            background-color: var(--gray-800);
+        }
+
+        #docs .container>div.grid-cols-2>div.bg-white {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #docs .container>div.grid-cols-2>div.bg-white h3.section-title {
+            color: var(--primary-blue);
+            text-shadow: 0 0 4px rgba(var(--primary-blue-rgb), 0.3);
+            margin-bottom: 1.2rem;
+        }
+
+        #docs .container>div.grid-cols-2>div.bg-white ul.space-y-2 li a {
+            color: var(--primary-purple);
+            font-size: 1.05rem;
+            transition: color 0.2s ease;
+        }
+
+        #docs .container>div.grid-cols-2>div.bg-white ul.space-y-2 li a:hover {
+            color: var(--neon-green);
+        }
+
+
+        /* Footer */
+        footer.bg-gray-900 {
+            background-color: var(--gray-900);
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        footer .container>div.grid-cols-4>div>h3.text-xl {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.04em;
+        }
+
+        footer .container>div.grid-cols-4>div>p.text-gray-400 {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        footer .container>div.grid-cols-4>div>h4.text-lg {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.04em;
+        }
+
+        footer .container>div.grid-cols-4>div>ul.space-y-2 li a {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            transition: color 0.2s ease;
+        }
+
+        footer .container>div.grid-cols-4>div>ul.space-y-2 li a:hover {
+            color: var(--primary-blue);
+        }
+
+        footer .container>div.border-t p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            margin-top: 1.5rem;
+        }
+
+
+        /* --- Color Palettes --- */
+        /* Define RGB values for colors to use in rgba() */
+        :root {
+            --primary-blue-rgb: 0, 123, 255;
+            /* rgb(0, 123, 255) */
+            --primary-purple-rgb: 163, 126, 255;
+            /* rgb(163, 126, 255) */
+            --neon-green-rgb: 57, 255, 20;
+            /* rgb(57, 255, 20) */
+            --neon-pink-rgb: 255, 105, 180;
+            /* rgb(255, 105, 180) */
+        }
+
+        /* Neon Text Effect */
+        .neon-text {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 400;
+            font-size: 4.5rem;
+            color: var(--neon-pink);
+            letter-spacing: 4px;
+            text-shadow: 
+                0 0 7px var(--neon-pink),
+                0 0 10px var(--neon-pink),
+                0 0 21px var(--neon-pink),
+                0 0 42px rgba(255, 105, 180, 0.7),
+                0 0 82px rgba(255, 105, 180, 0.5);
+            animation: neon-pulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes neon-pulse {
+            from {
+                opacity: 0.9;
+                text-shadow: 
+                    0 0 7px var(--neon-pink),
+                    0 0 10px var(--neon-pink),
+                    0 0 21px var(--neon-pink),
+                    0 0 42px rgba(255, 105, 180, 0.7);
+            }
+            to {
+                opacity: 1;
+                text-shadow: 
+                    0 0 7px var(--neon-pink),
+                    0 0 10px var(--neon-pink),
+                    0 0 21px var(--neon-pink),
+                    0 0 42px var(--neon-pink),
+                    0 0 82px var(--neon-pink),
+                    0 0 92px var(--neon-pink);
+            }
+        }
+
+        /* Typewriter Effect */
+        .typewriter {
+            overflow: hidden;
+            white-space: pre-line;
+            opacity: 0;
+            width: 0;
+            animation: none;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-right-color: transparent }
+            50% { border-right-color: var(--neon-green) }
+        }
+
+        .typewriter.start {
+            opacity: 1;
+            width: 100%;
+            transition: width 2s steps(50, end);
+        }
+
+        .typewriter.finished {
+            animation: none;
+            border-right: none;
+        }
+
+        /* Text Scramble Effect */
+        .scramble-text {
+            opacity: 0;
+            display: inline-block;
+            position: relative;
+            font-family: 'Source Code Pro', monospace;
+            transition: opacity 0.8s ease;
+        }
+
+        .scramble-text.visible {
+            opacity: 1;
+        }
+
+        .scramble-text .glitch {
+            display: inline-block;
+            color: var(--text-light);
+            animation: glitch-anim 0.2s ease infinite;
+        }
+
+        @keyframes glitch-anim {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+
+<body class="font-sans">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-transparent z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="text-2xl font-bold text-white">Hackathon.dev</a>
+                <div class="hidden md:flex space-x-4">
+                    <a href="#overview" class="nav-link">Overview</a>
+                    <a href="#schedule" class="nav-link">Schedule</a>
+                    <a href="#challenges" class="nav-link">Challenges</a>
+                    <a href="#prizes" class="nav-link">Prizes</a>
+                    <a href="#sponsors" class="nav-link">Sponsors</a>
+                    <a href="#judges" class="nav-link">Judges</a>
+                    <a href="#contestants" class="nav-link">Contestants</a>
+                    <a href="#docs" class="nav-link">Docs & Support</a>
+                </div>
+                <button class="">Register Now</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with 3D Scene -->
+    <div class="scene-container" id="scene-container"></div>
+    <section class="min-h-screen flex flex-col justify-between relative section" id="hero">
+        <div class="hero-content container mx-auto px-4 mt-[50px]">
+            <h1 class="hero-title">
+                The World's Largest Hackathon
+            </h1>
+            <h2 class="hero-subtitle">
+                100K Builders. 24 Hours. $1M+ in prizes.
+            </h2>
+            <p class="hero-text">
+                Join us for an unprecedented event.
+            </p>
+        </div>
+        <div class="container mx-auto px-4 mb-[50px]">
+            <div class="countdown-container">
+                <div class="timer-container">
+                    <div class="timer-segment">
+                        <div id="days" class="time-unit">00</div>
+                        <div class="unit-label">Days</div>
+                    </div>
+                    <div class="timer-segment">
+                        <div id="hours" class="time-unit">00</div>
+                        <div class="unit-label">Hours</div>
+                    </div>
+                    <div class="timer-segment">
+                        <div id="minutes" class="time-unit">00</div>
+                        <div class="unit-label">Minutes</div>
+                    </div>
+                    <div class="timer-segment">
+                        <div id="seconds" class="time-unit">00</div>
+                        <div class="unit-label">Seconds</div>
+                    </div>
+                </div>
+            </div>
+            <div class="register-container">
+                <div class="progress-container">
+                    <div class="progress-bar" id="registration-progress"></div>
+                </div>
+                <button class="">Register Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Judge Section - Futuristic Holographic Projections -->
+    <section id="judges" class="section py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="gradient-text text-center md:text-left section-title" data-text="Meet Our Judges">Meet Our Judges
+            </h2>
+            <div class="judge-carousel-container">
+                <div class="carousel-arrow prev"></div>
+                <div class="carousel-arrow next"></div>
+                <div class="judge-carousel">
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="judge_sarah.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Sarah Drasner</h3>
+                        <p>VP of Developer Experience at Netlify</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="sarah_v2.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Theo Browne</h3>
+                        <p>Founder of t3.gg</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="evan_you.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Evan You</h3>
+                        <p>Creator of Vue.js</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="judge_sarah.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>KP</h3>
+                        <p>Tech Influencer & Developer</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="judge_sarah.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Pieter Levels</h3>
+                        <p>Indie Hacker</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="judge_sarah.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Logan Kilpatrick</h3>
+                        <p>Developer Advocate</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="judge_sarah.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Cassidy Williams</h3>
+                        <p>Director of Developer Experience</p>
+                    </div>
+                    <div class="judge-card">
+                        <video autoplay loop muted playsinline class="judge-video">
+                            <source src="judge_sarah.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <h3>Kent C. Dodds</h3>
+                        <p>Educator & Open Source Maintainer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-nav"></div>
+        </div>
+    </section>
+
+    <!-- Sponsor Section -->
+    <section id="sponsors" class="section py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="gradient-text text-center md:text-left section-title" data-text="Our Sponsors">Our Sponsors</h2>
+            <div class="sponsor-grid">
+                <div class="sponsor-card">
+                    <h3>Supabase</h3>
+                    <p>Free real-time DB for your hack</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>Netlify</h3>
+                    <p>Deploy instantly with edge integration</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>Cloudflare</h3>
+                    <p>Edge-native infrastructure</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>Sentry</h3>
+                    <p>Error tracking & monitoring</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>ElevenLabs</h3>
+                    <p>AI-powered voice generation</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>Exa</h3>
+                    <p>Advanced AI capabilities</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>Loops</h3>
+                    <p>Email for modern software companies</p>
+                </div>
+                <div class="sponsor-card">
+                    <h3>Algorand</h3>
+                    <p>Blockchain for the next billion users</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="py-20 bg-gray-900 section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center gradient-text section-title scramble-text">Overview</h2>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4 section-title scramble-text">About the Event</h3>
+                    <p class="text-gray-600 mb-6 text-white typewriter">
+                        Join us for the world's largest hackathon, where innovation meets opportunity.
+                        With over $1 million in prizes and support from industry leaders, this is your
+                        chance to make history.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <span class="text-blue-600 mr-2">✓</span>
+                            <span>Global Participation</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-blue-600 mr-2">✓</span>
+                            <span>Expert Mentorship</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-blue-600 mr-2">✓</span>
+                            <span>Industry Networking</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4 section-title">Prize Pool</h3>
+                    <p class="text-4xl font-bold mb-4 neon-text">$1M+ Prize Pool</p>
+                    <p class="text-gray-600">
+                        Compete for a share of our massive prize pool, including cash prizes,
+                        mentorship opportunities, and potential job offers from leading tech companies.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prizes Section -->
+    <section id="prizes" class="py-20 bg-gray-800 section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center gradient-text section-title">Prizes</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2 section-title">1st Place</h3>
+                    <p class="text-3xl font-bold text-blue-600 mb-4">$500,000</p>
+                    <p class="text-gray-600">Plus mentorship and potential job opportunities</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2 section-title">2nd Place</h3>
+                    <p class="text-3xl font-bold text-blue-600 mb-4">$250,000</p>
+                    <p class="text-gray-600">Plus mentorship and potential job opportunities</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2 section-title">3rd Place</h3>
+                    <p class="text-3xl font-bold text-blue-600 mb-4">$100,000</p>
+                    <p class="text-gray-600">Plus mentorship and potential job opportunities</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" class="py-20 bg-gray-800 section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center gradient-text section-title">Schedule</h2>
+            <div class="max-w-3xl mx-auto">
+                <div class="space-y-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 section-title">Day 1</h3>
+                        <p class="text-gray-600">Opening Ceremony & Team Formation</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 section-title">Day 2-3</h3>
+                        <p class="text-gray-600">Hacking & Development</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 section-title">Day 4</h3>
+                        <p class="text-gray-600">Project Submissions & Judging</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 section-title">Day 5</h3>
+                        <p class="text-gray-600">Awards Ceremony & Networking</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenges Section -->
+    <section id="challenges" class="py-20 bg-gray-900 section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center gradient-text section-title">Challenges</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 section-title">AI & Machine Learning</h3>
+                    <p class="text-gray-600">Build innovative solutions using cutting-edge AI technologies</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 section-title">Web3 & Blockchain</h3>
+                    <p class="text-gray-600">Create decentralized applications and blockchain solutions</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 section-title">Sustainability</h3>
+                    <p class="text-gray-600">Develop solutions for environmental and social impact</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contestants Section -->
+    <section id="contestants" class="py-20 bg-gray-900 section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center gradient-text section-title">Contestants</h2>
+            <div class="max-w-3xl mx-auto text-center">
+                <p class="text-xl text-gray-600 mb-8 text-white">
+                    Join thousands of talented developers, designers, and innovators from around the world.
+                </p>
+                <button class="">Become a Contestant</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Docs & Support Section -->
+    <section id="docs" class="py-20 bg-gray-800 section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center gradient-text section-title">Docs & Support</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 section-title">Documentation</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-600 hover:underline">Getting Started Guide</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Submission Guidelines</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 section-title">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-600 hover:underline">Discord Community</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Email Support</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Technical Resources</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Hackathon.dev</h3>
+                    <p class="text-gray-400">Building the future through innovation</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#overview" class="text-gray-400 hover:text-white">Overview</a></li>
+                        <li><a href="#schedule" class="text-gray-400 hover:text-white">Schedule</a></li>
+                        <li><a href="#challenges" class="text-gray-400 hover:text-white">Challenges</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#docs" class="text-gray-400 hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Support</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Connect</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Twitter</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Discord</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2024 Hackathon.dev. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Enhanced Three.js Scene -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+        import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.getElementById('scene-container').appendChild(renderer.domElement);
+        renderer.setClearColor(0x000000);
+        scene.background = new THREE.Color(0x000000);
+
+        // Camera position
+        camera.position.z = 5; // Restore original camera distance
+
+        // Globe setup
+        const geometry = new THREE.IcosahedronGeometry(2, 5);
+
+        // Add a visible globe sphere with proper depth sorting
+        const globeGeometry = new THREE.SphereGeometry(2, 32, 32);
+        const globeMaterial = new THREE.MeshPhongMaterial({
+            color: 0x007bff,
+            transparent: true,
+            opacity: 0.1,
+            wireframe: false,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+        scene.add(globe);
+
+        // Add ambient light for better visibility
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        // Add directional light for better depth
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Original wireframe globe with adjusted material
+        const material = new THREE.LineBasicMaterial({
+            color: 0x007bff,
+            linewidth: 2,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+            depthWrite: true
+        });
+
+        const positions = geometry.attributes.position.array;
+        const numVertices = geometry.attributes.position.count;
+        const linesGeometry = new THREE.BufferGeometry();
+        const linePositions = [];
+        const colors = [];
+
+        const color1 = new THREE.Color(0x007bff);
+        const color2 = new THREE.Color(0xff00ff);
+
+        for (let i = 0; i < numVertices; i++) {
+            const x1 = positions[i * 3];
+            const y1 = positions[i * 3 + 1];
+            const z1 = positions[i * 3 + 2];
+
+            linePositions.push(x1, y1, z1);
+            colors.push(color1.r, color1.g, color1.b);
+
+            for (let j = i + 1; j < Math.min(i + 5, numVertices); j++) {
+                if (Math.random() < 0.5) {
+                    const x2 = positions[j * 3];
+                    const y2 = positions[j * 3 + 1];
+                    const z2 = positions[j * 3 + 2];
+
+                    linePositions.push(x1, y1, z1, x2, y2, z2);
+                    colors.push(color1.r, color1.g, color1.b, color1.r, color1.g, color1.b);
+                }
+            }
+        }
+
+        linesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+        linesGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        const lines = new THREE.LineSegments(linesGeometry, material);
+        scene.add(lines);
+
+        // Logo loading setup
+        const loader = new GLTFLoader();
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        loader.setDRACOLoader(dracoLoader);
+
+        // Define logo configurations
+        const logoConfigs = [
+            { file: 'bolt_logo_mesh.glb', scale: 0.5, orbit: 2.5, speed: -0.5, startAngle: Math.PI * 0.8, y: 0 },
+            { file: 'algrorand.glb', scale: 0.35, orbit: 3.2, speed: -0.48, startAngle: Math.PI * 0.5, y: 0.8 },
+            { file: 'cloudflare.glb', scale: 0.35, orbit: 3.5, speed: -0.52, startAngle: Math.PI, y: -1.0 },
+            { file: 'exa.glb', scale: 0.35, orbit: 3.8, speed: -0.45, startAngle: Math.PI * 1.5, y: 1.2 },
+            { file: 'hsr.glb', scale: 0.35, orbit: 4.0, speed: -0.47, startAngle: Math.PI * 0.25, y: -0.9 },
+            { file: 'loops.glb', scale: 0.35, orbit: 4.2, speed: -0.51, startAngle: Math.PI * 0.75, y: 0.7 },
+            { file: 'netlify.glb', scale: 0.35, orbit: 4.4, speed: -0.46, startAngle: Math.PI * 1.25, y: -1.1 },
+            { file: 'sentry.glb', scale: 0.35, orbit: 4.6, speed: -0.49, startAngle: Math.PI * 1.75, y: 1.0 },
+            { file: 'supabase.glb', scale: 0.35, orbit: 4.8, speed: -0.53, startAngle: Math.PI * 0.125, y: -0.8 }
+        ];
+
+        // Store loaded logos
+        const logos = new Map();
+
+        // Load all logos
+        logoConfigs.forEach(config => {
+            loader.load(
+                config.file,
+                (gltf) => {
+                    const logo = gltf.scene;
+                    logo.scale.set(config.scale, config.scale, config.scale);
+
+                    // Setup logo material and orientation
+                    logo.traverse((child) => {
+                        if (child.isMesh) {
+                            const newMaterial = new THREE.MeshBasicMaterial({
+                                map: child.material.map,
+                                transparent: true,
+                                opacity: 1,
+                                side: THREE.DoubleSide
+                            });
+
+                            if (newMaterial.map) {
+                                newMaterial.map.needsUpdate = true;
+                                newMaterial.map.colorSpace = THREE.SRGBColorSpace;
+                            }
+
+                            child.material = newMaterial;
+                            child.scale.x *= -1;
+                        }
+                    });
+
+                    // Store logo with its configuration
+                    logos.set(logo, {
+                        orbit: config.orbit,
+                        speed: config.speed,
+                        angle: config.startAngle,
+                        y: config.y,
+                        file: config.file // Store filename to identify bolt logo later
+                    });
+
+                    scene.add(logo);
+                },
+                (xhr) => {
+                    console.log(`${config.file}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                },
+                (error) => {
+                    console.error(`Error loading ${config.file}:`, error);
+                }
+            );
+        });
+
+        // Animation variables
+        let time = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Update globe colors
+            const colorsAttribute = linesGeometry.attributes.color;
+            const colorsArray = colorsAttribute.array;
+
+            for (let i = 0; i < numVertices * 3; i += 3) {
+                const t = time + i * 0.01;
+                const factor = Math.sin(t * 2) * 0.5 + 0.5;
+                color1.lerpColors(color2, color1, factor);
+
+                colorsArray[i] = color1.r;
+                colorsArray[i + 1] = color1.g;
+                colorsArray[i + 2] = color1.b;
+            }
+            colorsAttribute.needsUpdate = true;
+
+            // Animate all logos
+            time += 0.01;
+            logos.forEach((config, logo) => {
+                config.angle += config.speed * 0.01;
+
+                // Calculate position on orbit (with y-axis offset for 3D effect)
+                logo.position.x = Math.cos(config.angle) * config.orbit;
+                logo.position.y = config.y;
+                logo.position.z = Math.sin(config.angle) * config.orbit;
+
+                // Make logo face outward
+                logo.lookAt(0, 0, 0);
+
+                // Add a slight rotation to the logo itself
+                logo.rotation.y -= 0.02;
+            });
+
+            // Rotate the globe lines slightly for continuous motion
+            lines.rotation.y += 0.001;
+            globe.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Add scroll effect to fade logos based on scroll position
+        function handleScroll() {
+            // Get the sections
+            const heroSection = document.getElementById('hero');
+            const judgesSection = document.getElementById('judges');
+            const sponsorsSection = document.getElementById('sponsors');
+            const overviewSection = document.getElementById('overview');
+
+            // Get current scroll position
+            const scrollPosition = window.scrollY;
+
+            // Calculate section positions
+            const judgesSectionTop = judgesSection.offsetTop;
+            const sponsorsSectionTop = sponsorsSection.offsetTop;
+            const sponsorsSectionBottom = sponsorsSectionTop + sponsorsSection.offsetHeight;
+            const overviewSectionTop = overviewSection.offsetTop;
+
+            // Calculate fade factors
+            // 1. Fade in when approaching sponsors section (from judges)
+            const fadeInStart = judgesSectionTop + (sponsorsSectionTop - judgesSectionTop) * 0.01;
+            const fadeInEnd = sponsorsSectionTop;
+
+            // 2. Fade out when approaching overview section
+            const fadeOutStart = sponsorsSectionTop * 0.85;
+            const fadeOutEnd = sponsorsSectionTop * 1.2;
+
+            // Calculate opacity based on scroll position
+            let opacity = 0;
+
+            // Fade in calculation
+            if (scrollPosition >= fadeInStart && scrollPosition <= fadeInEnd) {
+                // Scroll is between judges and sponsors sections - fade in
+                opacity = (scrollPosition - fadeInStart) / (fadeInEnd - fadeInStart);
+            }
+            // Full opacity in sponsors section
+            else if (scrollPosition > fadeInEnd && scrollPosition < fadeOutStart) {
+                opacity = 1;
+            }
+            // Fade out calculation
+            else if (scrollPosition >= fadeOutStart && scrollPosition <= fadeOutEnd) {
+                // Scroll is between sponsors and overview - fade out
+                opacity = 1 - (scrollPosition - fadeOutStart) / (fadeOutEnd - fadeOutStart);
+            }
+
+            // Clamp opacity between 0 and 1
+            opacity = Math.max(0, Math.min(1, opacity));
+
+            // Apply opacity to all logos except bolt
+            logos.forEach((config, logo) => {
+                if (config.file !== 'bolt_logo_mesh.glb') {
+                    logo.traverse((child) => {
+                        if (child.isMesh && child.material) {
+                            child.material.opacity = opacity;
+                            // If completely transparent, disable rendering for performance
+                            child.visible = child.material.opacity > 0.01;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Add scroll event listener
+        window.addEventListener('scroll', handleScroll);
+
+        // Initial call to set visibility state
+        handleScroll();
+
+        // Add mouse interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            targetRotationX = mouseY * 0.5;
+            targetRotationY = mouseX * 0.5;
+        });
+
+        // Smooth rotation update
+        function updateRotation() {
+            lines.rotation.x += (targetRotationX - lines.rotation.x) * 0.05;
+            lines.rotation.y += (targetRotationY - lines.rotation.y) * 0.05;
+            globe.rotation.x += (targetRotationX - globe.rotation.x) * 0.05;
+            globe.rotation.y += (targetRotationY - globe.rotation.y) * 0.05;
+
+            requestAnimationFrame(updateRotation);
+        }
+        updateRotation();
+        animate();
+    </script>
+
+    <!-- Countdown and Progress Bar Script -->
+    <script>
+        // Countdown Timer
+        function updateTimer() {
+            // Set the target date
+            const targetDate = new Date("2025-04-22T00:00:00");
+
+            const now = new Date();
+            const difference = targetDate.getTime() - now.getTime();
+
+            if (difference <= 0) {
+                // If the event has passed, display "00" for all segments
+                document.getElementById("days").textContent = "00";
+                document.getElementById("hours").textContent = "00";
+                document.getElementById("minutes").textContent = "00";
+                document.getElementById("seconds").textContent = "00";
+                clearInterval(timerInterval); // Stop the interval
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            // Select the elements *once*
+            const daysDisplay = document.getElementById("days");
+            const hoursDisplay = document.getElementById("hours");
+            const minutesDisplay = document.getElementById("minutes");
+            const secondsDisplay = document.getElementById("seconds");
+
+            // Update the display, ensuring leading zeros
+            daysDisplay.textContent = days.toString().padStart(2, "0");
+            hoursDisplay.textContent = hours.toString().padStart(2, "0");
+            minutesDisplay.textContent = minutes.toString().padStart(2, "0");
+            secondsDisplay.textContent = seconds.toString().padStart(2, "0");
+        }
+
+        // Initial update and set interval
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000); // Update every second
+
+        // Progress Bar Animation
+        const progressBar = document.getElementById('registration-progress');
+        const progressContainer = document.querySelector('.progress-container');
+        let progress = 0;
+        let progressState = 0; // 0: 1/3, 1: 2/3, 2: full
+
+        function updateProgress() {
+            const states = [33, 66, 100];
+            progress = states[progressState];
+            progressBar.style.width = `${progress}%`;
+
+            // Add sparks based on progress
+            const sparkCount = Math.floor(progress / 20);
+            createSparks(sparkCount);
+        }
+
+        function createSparks(count) {
+            for (let i = 0; i < count; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'progress-spark';
+                const left = Math.random() * progress;
+                spark.style.left = `${left}%`;
+                spark.style.top = `${Math.random() * 100}%`;
+                progressContainer.appendChild(spark);
+
+                // Animate spark
+                requestAnimationFrame(() => {
+                    spark.style.opacity = '1';
+                    spark.style.transform = `translateY(${Math.random() * 20 - 10}px)`;
+                    setTimeout(() => {
+                        spark.style.opacity = '0';
+                        setTimeout(() => spark.remove(), 300);
+                    }, 200);
+                });
+            }
+        }
+
+        // Simulate progress changes
+        setInterval(() => {
+            progressState = (progressState + 1) % 3;
+            updateProgress();
+        }, 5000);
+
+        // Add hover effect
+        progressContainer.addEventListener('mouseenter', () => {
+            const intenseSparks = setInterval(() => createSparks(5), 100);
+            progressContainer.addEventListener('mouseleave', () => {
+                clearInterval(intenseSparks);
+            }, { once: true });
+        });
+
+        // Initial progress update
+        updateProgress();
+    </script>
+
+    <!-- Judges Carousel Navigation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousel = document.querySelector('.judge-carousel');
+            const cards = carousel.querySelectorAll('.judge-card');
+            const navContainer = document.querySelector('.carousel-nav');
+            const prevButton = document.querySelector('.carousel-arrow.prev');
+            const nextButton = document.querySelector('.carousel-arrow.next');
+
+            // Clone cards for infinite loop
+            cards.forEach(card => {
+                const clone = card.cloneNode(true);
+                carousel.appendChild(clone);
+            });
+
+            // Navigation arrows functionality
+            prevButton.addEventListener('click', () => {
+                const currentDot = document.querySelector('.carousel-dot.active');
+                const currentIndex = Array.from(navContainer.children).indexOf(currentDot);
+                const newIndex = currentIndex > 0 ? currentIndex - 1 : cards.length - 1;
+                scrollToPosition(newIndex);
+            });
+
+            nextButton.addEventListener('click', () => {
+                const currentDot = document.querySelector('.carousel-dot.active');
+                const currentIndex = Array.from(navContainer.children).indexOf(currentDot);
+                const newIndex = currentIndex < cards.length - 1 ? currentIndex + 1 : 0;
+                scrollToPosition(newIndex);
+            });
+
+            // Create navigation dots
+            const numDots = cards.length;
+            for (let i = 0; i < numDots; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                dot.addEventListener('click', () => scrollToPosition(i));
+                navContainer.appendChild(dot);
+            }
+
+            // Infinite scroll handling
+            carousel.addEventListener('scroll', () => {
+                const totalWidth = carousel.scrollWidth / 2;
+
+                if (carousel.scrollLeft === 0) {
+                    // If we're at the start, jump to the middle set
+                    carousel.scrollLeft = totalWidth;
+                } else if (carousel.scrollLeft >= totalWidth * 2 - carousel.offsetWidth) {
+                    // If we're at the end, jump to the first set
+                    carousel.scrollLeft = totalWidth - carousel.offsetWidth;
+                }
+
+                updateActiveDot();
+            });
+
+            function updateActiveDot() {
+                const cardWidth = cards[0].offsetWidth;
+                const gap = 32;
+                const totalWidth = carousel.scrollWidth / 2;
+                const normalizedScroll = carousel.scrollLeft % totalWidth;
+                const currentIndex = Math.round(normalizedScroll / (cardWidth + gap));
+
+                document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentIndex);
+                });
+            }
+
+            function scrollToPosition(index) {
+                const cardWidth = cards[0].offsetWidth;
+                const gap = 32;
+                const scrollPosition = index * (cardWidth + gap);
+
+                carousel.scrollTo({
+                    left: scrollPosition,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Add keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                const currentDot = document.querySelector('.carousel-dot.active');
+                const currentIndex = Array.from(navContainer.children).indexOf(currentDot);
+
+                if (e.key === 'ArrowLeft') {
+                    scrollToPosition(currentIndex > 0 ? currentIndex - 1 : numDots - 1);
+                } else if (e.key === 'ArrowRight') {
+                    scrollToPosition(currentIndex < numDots - 1 ? currentIndex + 1 : 0);
+                }
+            });
+
+            // Initial scroll to middle set of cards
+            carousel.scrollLeft = carousel.scrollWidth / 4;
+        });
+    </script>
+
+    <!-- Text Animation Effects Script -->
+    <script>
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+                this.frameRate = 120;
+                this.isAnimating = false;
+            }
+            
+            setText(newText) {
+                if (this.isAnimating) return Promise.resolve(); // Prevent multiple animations
+                this.isAnimating = true;
+                
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => this.resolve = resolve);
+                this.queue = [];
+                
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 80);
+                    const end = start + Math.floor(Math.random() * 120);
+                    this.queue.push({ from, to, start, end });
+                }
+                
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            
+            update() {
+                let output = '';
+                let complete = 0;
+                
+                for (let i = 0; i < this.queue.length; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.15) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += `<span class="glitch">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                
+                this.el.innerHTML = output;
+                
+                if (complete === this.queue.length) {
+                    this.isAnimating = false; // Reset animation flag
+                    this.resolve();
+                } else {
+                    setTimeout(() => {
+                        this.frameRequest = requestAnimationFrame(this.update);
+                    }, 1000 / this.frameRate);
+                    this.frame++;
+                }
+            }
+            
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        // Initialize Intersection Observer and Hover Effects
+        document.addEventListener('DOMContentLoaded', () => {
+            // Store TextScramble instances for reuse
+            const scrambleInstances = new Map();
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        
+                        // Handle scramble text effect
+                        if (element.classList.contains('scramble-text')) {
+                            element.classList.add('visible');
+                            const fx = new TextScramble(element);
+                            scrambleInstances.set(element, fx); // Store instance
+                            const originalText = element.innerText;
+                            fx.setText(originalText).then(() => {
+                                element.style.opacity = 1;
+                            });
+                            
+                            // Add hover effect
+                            element.addEventListener('mouseenter', () => {
+                                const fx = scrambleInstances.get(element);
+                                if (fx) {
+                                    fx.setText(originalText);
+                                }
+                            });
+                        }
+                        
+                        // Handle typewriter effect
+                        if (element.classList.contains('typewriter')) {
+                            element.classList.add('start');
+                            setTimeout(() => {
+                                element.classList.add('finished');
+                            }, 2000);
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.5,
+                rootMargin: '-50px'
+            });
+
+            // Observe elements
+            setTimeout(() => {
+                document.querySelectorAll('.scramble-text').forEach(el => {
+                    observer.observe(el);
+                });
+
+                document.querySelectorAll('.typewriter').forEach(el => {
+                    observer.observe(el);
+                });
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>
